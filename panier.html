@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Panier</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    :root{
+      --config-background:url('background.jpg');
+      --primary-color:#0088cc;
+    }
+    body{
+      min-height:100vh;
+      background-color:#1f1f1f;
+      background-image:var(--config-background);
+      background-size:cover;background-position:center;background-repeat:no-repeat;
+      color:#e0e0e0;
+      font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+      padding-top:110px;
+      padding-bottom:60px;
+    }
+    header{
+      height:120px;display:flex;align-items:center;justify-content:center;
+      background-color:rgba(31,31,31,0.2);
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(51,51,51,0.2);
+      position:fixed;top:0;left:0;width:100%;z-index:100;
+    }
+    header a img{height:100px;}
+    #back-button{
+      position:absolute;left:15px;top:50%;transform:translateY(-50%);
+      border-radius:20px;padding:5px 12px;
+      background:rgba(40,40,40,0.6);border:1px solid rgba(255,255,255,0.15);
+      color:#e0e0e0;font-size:0.85rem;cursor:pointer;
+    }
+    .cart-summary{
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(0,0,0,0.4);
+      border:1px solid rgba(255,255,255,0.18);
+      font-size:0.75rem;
+      color:#f5f5f5;
+      min-width:90px;
+      text-align:right;
+      white-space:nowrap;
+    }
+    .container{max-width:960px;margin:0 auto;padding:0 12px;}
+    .card{
+      background:rgba(30,30,30,0.9);
+      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      border-radius:10px;border:1px solid rgba(255,255,255,0.1);
+      padding:14px;margin-bottom:12px;
+    }
+    .cart-item{
+      display:flex;gap:10px;margin-bottom:10px;
+      border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:8px;
+    }
+    .cart-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+    .cart-thumb{
+      width:60px;height:60px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#000;
+    }
+    .cart-thumb img{width:100%;height:100%;object-fit:cover;}
+    .cart-main{flex:1;}
+    .cart-title{font-size:0.9rem;font-weight:600;}
+    .cart-meta{font-size:0.8rem;color:#a3a3a3;}
+    .cart-row-bottom{
+      display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:0.8rem;
+    }
+    .qty-input{
+      width:60px;padding:4px 6px;border-radius:999px;border:1px solid #555;
+      background:rgba(20,20,20,0.8);color:#e5e5e5;text-align:center;font-size:0.8rem;
+    }
+    .btn-small{
+      padding:4px 8px;border-radius:999px;border:none;font-size:0.75rem;
+      cursor:pointer;background:rgba(60,60,60,0.9);color:#e5e5e5;
+    }
+    .btn-small:hover{background:rgba(90,90,90,0.9);}
+    .total-row{display:flex;justify-content:space-between;font-weight:600;margin-top:6px;}
+    .actions{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+    .btn-main,.btn-secondary{
+      display:block;width:100%;padding:10px 16px;border-radius:999px;border:none;
+      font-size:0.9rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;
+      cursor:pointer;text-align:center;text-decoration:none;color:#fff;
+    }
+    .btn-main{background:var(--primary-color);}
+    .btn-main:hover{opacity:0.9;}
+    .btn-secondary{background:rgba(40,40,40,0.9);}
+    .btn-secondary:hover{background:rgba(60,60,60,0.9);}
+    #summary{
+      width:100%;min-height:90px;margin-top:8px;padding:8px;
+      border-radius:8px;border:1px solid rgba(255,255,255,0.15);
+      background:rgba(10,10,10,0.7);color:#e5e5e5;font-size:0.78rem;
+    }
+    .empty{text-align:center;margin-top:40px;font-size:0.9rem;color:#cbd5f5;}
+    @media(max-width:576px){
+      header a img{height:90px;}
+      .cart-summary{
+        font-size:0.7rem;
+        padding:4px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button id="back-button" onclick="location.href='index.html'">← Catalogue</button>
+    <a href="index.html">
+      <img id="header-logo" src="logo.png" alt="Logo">
+    </a>
+    <div id="cart-summary" class="cart-summary">Panier : 0 · 0,00 €</div>
+  </header>
+
+  <div class="container" style="margin-top:10px;">
+    <div id="cart-box" class="card" style="display:none;">
+      <h2 style="font-size:1.1rem;margin-bottom:8px;">Panier</h2>
+      <div id="cart-items"></div>
+      <div class="total-row">
+        <span>Total :</span>
+        <span id="total-price">0.00 €</span>
+      </div>
+      <div class="actions">
+        <button class="btn-secondary" id="clear-cart">Vider le panier</button>
+      </div>
+    </div>
+
+    <div id="order-box" class="card" style="display:none;">
+      <h3 style="font-size:1rem;margin-bottom:6px;">Récapitulatif commande</h3>
+      <textarea id="summary" readonly></textarea>
+      <div class="actions">
+        <button class="btn-secondary" id="copy-summary">Copier le récapitulatif</button>
+        <button class="btn-main" id="send-order">Envoyer la commande</button>
+      </div>
+      <p style="margin-top:6px;font-size:0.78rem;color:#a3a3a3;">
+        Le texte est copié, tu peux le coller dans la conversation si besoin.
+      </p>
+    </div>
+
+    <p id="empty-msg" class="empty" style="display:none;">Ton panier est vide.</p>
+  </div>
+
+  <script>
+    let appConfig={};
+
+    // mini résumé panier
+    function updateCartSummary(){
+      const el = document.getElementById('cart-summary');
+      if(!el) return;
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      if(!cart.length){
+        el.textContent = 'Panier : 0 · 0,00 €';
+        return;
+      }
+      let qty = 0;
+      let total = 0;
+      cart.forEach(it=>{
+        const q = Number(it.qty || 0);
+        const p = Number(it.price || 0);
+        qty += q;
+        total += q * p;
+      });
+      el.textContent = 'Panier : ' + qty + ' · ' + total.toFixed(2) + ' €';
+    }
+    window.addEventListener('storage', updateCartSummary);
+    updateCartSummary();
+
+    fetch('config.json?'+Date.now())
+      .then(r=>r.json())
+      .then(cfg=>{
+        appConfig=cfg||{};
+        if(appConfig.catalogBackgroundUrl){
+          document.documentElement.style.setProperty(
+            '--config-background',
+            `url('${appConfig.catalogBackgroundUrl.replace(/'/g,"\\'")}')`
+          );
+        }
+        if(appConfig.primaryColor){
+          document.documentElement.style.setProperty('--primary-color', appConfig.primaryColor);
+        }
+        if(appConfig.logoUrl){
+          document.getElementById('header-logo').src=appConfig.logoUrl;
+        }
+        renderCart();
+      })
+      .catch(()=>{
+        renderCart();
+      });
+
+    function renderCart(){
+      const cart=JSON.parse(localStorage.getItem('cart')||'[]');
+      const cartBox=document.getElementById('cart-box');
+      const orderBox=document.getElementById('order-box');
+      const empty=document.getElementById('empty-msg');
+      const itemsEl=document.getElementById('cart-items');
+      const totalEl=document.getElementById('total-price');
+
+      if(!cart.length){
+        cartBox.style.display='none';
+        orderBox.style.display='none';
+        empty.style.display='block';
+        document.getElementById('summary').value='';
+        totalEl.textContent='0.00 €';
+        updateCartSummary();
+        return;
+      }
+      empty.style.display='none';
+      cartBox.style.display='block';
+      orderBox.style.display='block';
+
+      itemsEl.innerHTML='';
+      let total=0;
+
+      cart.forEach((item,index)=>{
+        const lineTotal=item.price*item.qty;
+        total+=lineTotal;
+        const div=document.createElement('div');
+        div.className='cart-item';
+        div.innerHTML=`
+          <div class="cart-thumb">
+            <img src="${item.image}" alt="${escapeHtml(item.nom)}">
+          </div>
+          <div class="cart-main">
+            <div class="cart-title">${escapeHtml(item.nom)}</div>
+            <div class="cart-meta">${escapeHtml(item.optionLabel)}</div>
+            <div class="cart-row-bottom">
+              <div>
+                <span>${item.price.toFixed(2)} € / u</span>
+                &nbsp;|&nbsp;
+                <span>${lineTotal.toFixed(2)} €</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;">
+                <input type="number" class="qty-input" min="1" value="${item.qty}" data-index="${index}">
+                <button class="btn-small" data-remove="${index}">Supprimer</button>
+              </div>
+            </div>
+          </div>
+        `;
+        itemsEl.appendChild(div);
+      });
+
+      totalEl.textContent=total.toFixed(2)+' €';
+      buildSummary(cart,total);
+      updateCartSummary();
+    }
+
+    function buildSummary(cart,total){
+      const now=new Date();
+      const dateStr=now.toLocaleString('fr-FR');
+      let lines=[];
+      lines.push('Commande – '+dateStr);
+      lines.push('-----------------------------');
+      cart.forEach(it=>{
+        lines.push(`${it.qty} x ${it.nom} (${it.optionLabel}) – ${it.price.toFixed(2)} € / u`);
+      });
+      lines.push('-----------------------------');
+      lines.push('Total : '+total.toFixed(2)+' €');
+      lines.push('');
+      lines.push('Merci 🙏');
+      document.getElementById('summary').value=lines.join('\n');
+    }
+
+    document.getElementById('cart-items').addEventListener('change',e=>{
+      if(e.target.classList.contains('qty-input')){
+        const idx=parseInt(e.target.dataset.index,10);
+        let qty=parseInt(e.target.value,10);
+        if(isNaN(qty)||qty<1) qty=1;
+        const cart=JSON.parse(localStorage.getItem('cart')||'[]');
+        if(cart[idx]){
+          cart[idx].qty=qty;
+          localStorage.setItem('cart',JSON.stringify(cart));
+          renderCart();
+        }
+      }
+    });
+
+    document.getElementById('cart-items').addEventListener('click',e=>{
+      const rem=e.target.getAttribute('data-remove');
+      if(rem!==null){
+        const idx=parseInt(rem,10);
+        const cart=JSON.parse(localStorage.getItem('cart')||'[]');
+        cart.splice(idx,1);
+        localStorage.setItem('cart',JSON.stringify(cart));
+        renderCart();
+      }
+    });
+
+    document.getElementById('clear-cart').addEventListener('click',()=>{
+      if(!confirm('Vider le panier ?')) return;
+      localStorage.removeItem('cart');
+      renderCart();
+    });
+
+    document.getElementById('copy-summary').addEventListener('click',()=>{
+      const text=document.getElementById('summary').value;
+      if(!text.trim()){
+        alert('Aucune commande à copier.');
+        return;
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text)
+          .then(()=>alert('Récapitulatif copié 👍'))
+          .catch(()=>fallbackCopy(text));
+      }else{
+        fallbackCopy(text);
+      }
+    });
+
+    function fallbackCopy(text){
+      const textarea=document.createElement('textarea');
+      textarea.value=text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try{document.execCommand('copy');alert('Récapitulatif copié 👍');}
+      catch(e){alert('Copie automatique impossible, copie à la main.');}
+      document.body.removeChild(textarea);
+    }
+
+    document.getElementById('send-order').addEventListener('click',()=>{
+      const text=document.getElementById('summary').value;
+      if(text && navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).catch(()=>{});
+      }
+      const url=appConfig.orderRedirectUrl || appConfig.telegramContactUrl;
+      if(url && url!=='#'){
+        window.location.href=url;
+      }else{
+        alert('Aucun lien de contact configuré dans config.json.');
+      }
+    });
+
+    function escapeHtml(str){
+      return String(str||'')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+    }
+  </script>
+</body>
+</html>

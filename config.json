@@ -1,0 +1,11 @@
+{
+    "siteName": "Le petit désigner",
+    "tagline": "Notre menu",
+    "logoUrl": "https:\/\/i.postimg.cc\/Vk5Ybyqd\/Design-sans-titre-20251124-072328-0000.png",
+    "catalogBackgroundUrl": "https:\/\/i.postimg.cc\/wqjky0Pn\/Design-sans-titre-20251124-072946-0000.png",
+    "primaryColor": "#0088cc",
+    "telegramContactUrl": "https:\/\/t.me\/lepetitdesigner",
+    "orderRedirectUrl": "https:\/\/t.me\/lepetitdesigner",
+    "orderRedirectLabel": "Envoyer ma commande sur Telegram",
+    "infoText": "Clique sur un produit pour voir les grammages, les prix et l’ajouter au panier."
+}

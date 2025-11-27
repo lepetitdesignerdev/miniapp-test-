@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "nom": "Amenezia haze",
+        "categorie": "Weed",
+        "farm": "test farmz",
+        "image": "https:\/\/i.postimg.cc\/Jz7F4kfL\/Screenshot-20251126-202835-com-hihonor-photos-Slot-Album-Activity.jpg",
+        "video_url": "https:\/\/files.catbox.moe\/2qvhbc.mp4",
+        "description": "Amnesia haze qualitative, goût sucré et crémeux.",
+        "prix_options": [
+            {
+                "label": "1g",
+                "prix": 8
+            },
+            {
+                "label": "5g",
+                "prix": 35
+            },
+            {
+                "label": "10g",
+                "prix": 65
+            }
+        ],
+        "badges": [
+            "Holandia 🇳🇱"
+        ],
+        "featured": true,
+        "in_stock": true
+    }
+]
